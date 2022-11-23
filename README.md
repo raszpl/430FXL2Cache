@@ -62,11 +62,13 @@ First part of C1 is responsible for detecting ram, lets skip that. Next we switc
     _F000:E1E5                 jmp     far ptr loc_FE1EA
     _F000:E1EA loc_FE1EA:
 
-That jump at the end is very important to properly switch CPU mode. Next fragment seems to disable/enable L1 cache depending on a variable stored in CMOS under address 3Dh (0BDh but actual address is only 7 bit).
+That jump at the end is very important to properly switch CPU mode. Next fragment disables L1 cache.
 
-    _F000:E1EA                 mov     al, 0FFh
+    _F000:E1EA                 mov     al, 0FFh        ; Enable L1 cache
     _F000:E1EC                 mov     sp, 0E1F2h
     _F000:E1EF                 jmp     CMOS_L1cache
+    
+CMOS_L1cache disables/enables L1 cache if variable stored in CMOS under address 3Dh (0BDh but actual address is only 7 bit) is not ffh and doesnt have 8th bit set. Speculation: is this where Award Bios stores L1 cache disable variable?
     
     _F000:F4FC CMOS_L1cache    proc near
     _F000:F4FC                 mov     ah, al
@@ -90,7 +92,6 @@ That jump at the end is very important to properly switch CPU mode. Next fragmen
     _F000:F522                 wbinvd
     _F000:F524                 jmp     short locret_FF534
     _F000:F526 ; ---------------------------------------------------------------------------
-    _F000:F526
     _F000:F526 L1cache_enable:
     _F000:F526                 mov     eax, cr0
     _F000:F529                 and     eax, 9FFFFFFFh
@@ -103,7 +104,7 @@ That jump at the end is very important to properly switch CPU mode. Next fragmen
     
 After that its finally off to the races.
 ### Looking at the code
-Actual L2 Cache detection procedure lies before us. First order of business seems to be setting maximum potential cache size supported (512KB), Cache type compatible with all possible choices - Async, and mode of operation "Disabled; tag invalidate on reads" resetting TAG sram Valid bits on access.
+Actual L2 Cache detection procedure lies before us. First order of business seems to be setting maximum potential cache size supported (512KB), Cache type compatible with all possible choices (Async), and mode of operation resetting TAG ram Valid bits on access (Disabled; tag invalidate on reads).
 
     _F000:E1F4 cache_detect:
     _F000:E1F4                 mov     cx, 52h
@@ -131,7 +132,7 @@ Scans ram loading all possible cached range in order to ensure whole TAG ram is 
     _F000:E213                 jnz     short loc_FE205
     
     
-Eagle eyed among you might notice unusual x86 instruction combination REP LODS, often taught as useless and never used or even non existing at all! yet here it is doing the heavy lifting :) First to try is the most common L2 256KB Async setup.
+Eagle eyed among you might notice unusual x86 instruction combination REP LODS, often taught as useless and never used or even non existing at all! yet here it is doing heavy lifting :) First to try is the most common L2 256KB Async setup.
     
     _F000:E215                 mov     cx, 52h
     _F000:E218                 mov     al, 61h         ; 256KB Async Normal L2 cache operation (dependent on SGS)
@@ -253,7 +254,7 @@ bad - stc, ignore next jnb
     _F000:E2AB                 dw offset loc_FE2AD
     _F000:E2AD ; ---------------------------------------------------------------------------
 
-This next part is interesting. This code tries to make sure we have 512KB cache installed by comparing 8 bytes written to address 0000 with 8 different bytes written to 256KB? Is cache working in cache_as_ram mode? At this moment I dont understand how this works.
+This next part is interesting. This code tries to make sure we have 512KB cache installed by writing 8 byte magic number to address 0000, flushing and invalidating both L1 and L2 cache??, then another different magic number to 256KB, another cache flush, and finally checking if first magic number is still there. Is cache working in cache_as_ram mode? At this moment I dont understand how this works, wbinvd is supposed to drop all cache and we barely initialized ram controller at this point. Im lost here.
 
     _F000:E2AD loc_FE2AD:
     _F000:E2AD                 xor     si, si
@@ -332,7 +333,7 @@ Again this weird 4 bytes x 4000h x 8 = 512KB between 64KB and ~590KB. Why not 0-
     _F000:E339                 rep lodsd
     _F000:E33C                 sub     dx, 1000h
     _F000:E340                 jnz     short loc_FE332
-    _F000:E342                 mov     al, 0
+    _F000:E342                 mov     al, 0           ; Disable L1 cache
     _F000:E344                 mov     sp, 0E34Ah
     _F000:E347                 jmp     CMOS_L1cache
     _F000:E347 ; ---------------------------------------------------------------------------
