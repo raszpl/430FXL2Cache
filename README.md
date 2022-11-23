@@ -1,6 +1,8 @@
-Intel 430FX L2 Cache auto detection investigation based on code extracted from Asus PCI/I-P54TP4 bios [T15I0302.AWD](T15I0302.AWD)
+Intel 430FX L2 Cache auto detection investigation based on code extracted from Asus PCI/I-P54TP4 bios
 
-### Documentation:
+### Resources
+
+Asus PCI/I-P54TP4 bios [T15I0302.AWD](T15I0302.AWD)
 
 [Award BIOS (4-5x PnP) post code list](Award%20BIOS%20(4-5x%20PnP)%20post%20codes.md)
 
