@@ -68,7 +68,7 @@ That jump at the end is very important to properly switch CPU mode. Next fragmen
     _F000:E1EC                 mov     sp, 0E1F2h
     _F000:E1EF                 jmp     CMOS_L1cache
     
-CMOS_L1cache disables/enables L1 cache if variable stored in CMOS under address 3Dh (0BDh but actual address is only 7 bit) is not ffh and doesnt have 8th bit set. Speculation: is this where Award Bios stores L1 cache disable variable?
+CMOS_L1cache disables/enables L1 cache if variable stored in CMOS under address 3Dh (0BDh but actual address is only 7 bit) is not ffh but has 8th bit set. Speculation: is this where Award Bios stores L1 cache disable variable?
     
     _F000:F4FC CMOS_L1cache    proc near
     _F000:F4FC                 mov     ah, al
@@ -116,7 +116,7 @@ Actual L2 Cache detection procedure lies before us. First order of business seem
     _F000:E201 ; ---------------------------------------------------------------------------
     _F000:E201
 
-Scans ram loading all possible cached range in order to ensure whole TAG ram is invalidated? This seems to load 4 bytes x 4000h x 8 = 512KB between 64KB and ~590KB. Why so weird I dont know.
+Reads 512KB in order to ensure whole TAG ram is invalidated? This seems to load 4 bytes x 4000h x 8 = 512KB between 64KB and ~590KB. Why so weird I dont know.
 
     _F000:E201 cache_invalidate:
     _F000:E201                 cld
@@ -254,7 +254,7 @@ bad - stc, ignore next jnb
     _F000:E2AB                 dw offset loc_FE2AD
     _F000:E2AD ; ---------------------------------------------------------------------------
 
-This next part is interesting. This code tries to make sure we have 512KB cache installed by writing 8 byte magic number to address 0000, flushing and invalidating both L1 and L2 cache??, then another different magic number to 256KB, another cache flush, and finally checking if first magic number is still there. Is cache working in cache_as_ram mode? At this moment I dont understand how this works, wbinvd is supposed to drop all cache and we barely initialized ram controller at this point. Im lost here.
+This next part is interesting. This code tries to make sure we have 512KB cache installed by writing 8 byte magic number to address 0000, flushing and invalidating both L1 and L2 cache??, then another different magic number at 256KB, another cache flush, and finally checking if first magic number is still there. Is cache working in cache_as_ram mode? At this moment I dont understand how this works, wbinvd is supposed to drop all cache and we barely initialized ram controller at this point. Im lost here.
 
     _F000:E2AD loc_FE2AD:
     _F000:E2AD                 xor     si, si
