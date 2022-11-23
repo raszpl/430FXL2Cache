@@ -115,7 +115,7 @@ Actual L2 Cache detection procedure lies before us. First order of business seem
     _F000:E201 ; ---------------------------------------------------------------------------
     _F000:E201
 
-we scan ram loading all possible cached range in order to ensure whole TAG ram is invalidated.
+Scans ram loading all possible cached range in order to ensure whole TAG ram is invalidated? This seems to load 4 bytes x 4000h x 8 = 512KB between 64KB and ~590KB. Why so weird I dont know.
 
     _F000:E201 cache_invalidate:
     _F000:E201                 cld
@@ -145,9 +145,9 @@ Eagle eyed among you might notice unusual x86 instruction combination REP LODS, 
     _F000:E222                 mov     sp, 0E228h
     _F000:E225                 jmp     cache_test
     
-cache_test is at the bottom. TLDR is
-    ok - clc, take next jnb
-    bad - stc, ignore next jnb
+cache_test is at the bottom. TLDR is<br>
+ok - clc, take next jnb<br>
+bad - stc, ignore next jnb
     
     _F000:E225 ; ---------------------------------------------------------------------------
     _F000:E228                 dw offset loc_FE22A
@@ -252,7 +252,9 @@ cache_test is at the bottom. TLDR is
     _F000:E2A8 ; ---------------------------------------------------------------------------
     _F000:E2AB                 dw offset loc_FE2AD
     _F000:E2AD ; ---------------------------------------------------------------------------
-    _F000:E2AD
+
+This next part is interesting. This code tries to make sure we have 512KB cache installed by comparing 8 bytes written to address 0000 with 8 different bytes written to 256KB? Is cache working in cache_as_ram mode? At this moment I dont understand how this works.
+
     _F000:E2AD loc_FE2AD:
     _F000:E2AD                 xor     si, si
     _F000:E2AF                 xor     ax, ax
@@ -316,7 +318,9 @@ cache_test is at the bottom. TLDR is
     _F000:E32A ; ---------------------------------------------------------------------------
     _F000:E32D                 dw offset cache_prefill
     _F000:E32F ; ---------------------------------------------------------------------------
-    _F000:E32F
+
+Again this weird 4 bytes x 4000h x 8 = 512KB between 64KB and ~590KB. Why not 0-512KB range?
+
     _F000:E32F cache_prefill:
     _F000:E32F                 mov     dx, 8000h
     _F000:E332
@@ -341,10 +345,10 @@ cache_test is at the bottom. TLDR is
     _F000:E351                 retn
     _F000:E351 ram_cache       endp
     _F000:E351
-    _F000:E352
     _F000:E352 ; =============== S U B R O U T I N E =======================================
-    _F000:E352
-    _F000:E352
+
+Load 16KB from between 64-80KB. Store 2KB of magic numbers at 64KB, flush cache, check if 2KB of magic numbers is still there.
+
     _F000:E352 cache_test      proc near
     _F000:E352                 cld
     _F000:E353                 mov     ax, 1000h
@@ -388,8 +392,6 @@ cache_test is at the bottom. TLDR is
     _F000:E3B9                 clc
     _F000:E3BA                 retn
     _F000:E3BB ; ---------------------------------------------------------------------------
-    _F000:E3BB
     _F000:E3BB loc_FE3BB:
     _F000:E3BB                 stc
     _F000:E3BC                 retn
-    _F000:E3BC cache_test      endp
