@@ -398,3 +398,6 @@ Load 16KB from between 64-80KB. Store 2KB of magic numbers at 64KB, flush cache,
     _F000:E3BB loc_FE3BB:
     _F000:E3BB                 stc
     _F000:E3BC                 retn
+
+### Comments
+Please feel free to correct any mistakes I made and expand explanations. You can use Github Issues of just send pull requests. All contributions are welcome.
