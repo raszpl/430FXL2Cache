@@ -70,7 +70,7 @@ That jump at the end is very important to properly switch CPU mode. Next fragmen
     _F000:E1EC                 mov     sp, 0E1F2h
     _F000:E1EF                 jmp     CMOS_L1cache
     
-CMOS_L1cache disables/enables L1 cache if variable stored in CMOS under address 3Dh (0BDh but actual address is only 7 bit) is not ffh but has 8th bit set. Speculation: is this where Award Bios stores L1 cache disable variable?
+CMOS_L1cache enables/disables L1 cache depending on accumulator, but only if variable stored in CMOS under address 3Dh (0BDh but actual CMOS addresses are only 7 bit long) is not ffh but has 8th bit set. Speculation: is this where Award Bios stores L1 cache disable variable?
     
     _F000:F4FC CMOS_L1cache    proc near
     _F000:F4FC                 mov     ah, al
