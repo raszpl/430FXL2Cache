@@ -28,6 +28,8 @@ Intel Engineer wanted to be funny and the last table has FLCE and SCFMI bit orde
 
 Online [Assembly x86 Emulator](https://carlosrafaelgn.com.br/Asm86/)
 
+[Online Assembler and Disassembler](https://shell-storm.org/online/Online-Assembler-and-Disassembler/) with x86 16bit mode support
+
 ### Looking for the code
 
 I started by dissasembling bios file using IDA. You begin by loading bios file and selecting "Intel 80x86 processors:metapc", hitting OK, then clicking 16bit. Next you need to relocate code to the address actual BIOS is mapped at in a real computer. Open "ICD Command..." (Shift+F2) and paste:
