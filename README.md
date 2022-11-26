@@ -1,6 +1,6 @@
 Intel 430FX L2 Cache auto detection investigation based on code extracted from Asus PCI/I-P54TP4 bios
 
-### Resources
+### Resources and Tools
 
 Asus PCI/I-P54TP4 bios [T15I0302.AWD](T15I0302.AWD)
 
@@ -29,6 +29,10 @@ Intel Engineer wanted to be funny and the last table has FLCE and SCFMI bit orde
 Online [Assembly x86 Emulator](https://carlosrafaelgn.com.br/Asm86/)
 
 [Online Assembler and Disassembler](https://shell-storm.org/online/Online-Assembler-and-Disassembler/) with x86 16bit mode support
+
+[Online-x86-assembler](https://defuse.ca/online-x86-assembler.htm)
+
+[HxD - Freeware Hex Editor](https://mh-nexus.de/en/hxd/)
 
 ### Looking for the code
 
