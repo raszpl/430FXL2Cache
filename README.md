@@ -407,5 +407,47 @@ Load 16KB from between 64-80KB. Store 2KB of magic numbers at 64KB, flush cache,
     _F000:E3BB                 stc
     _F000:E3BC                 retn
 
+Helper functions to read/write PCI space registers:
+
+    _F000:F688 pci_read_dev    proc near
+    _F000:F688                 mov     ax, 8000h
+    _F000:F68B                 shl     eax, 10h
+    _F000:F68F                 mov     ax, cx
+    _F000:F691                 and     al, 0FCh
+    _F000:F693                 mov     dx, 0CF8h
+    _F000:F696                 out     dx, eax         ; PCI Configuration Space Address Register
+    _F000:F696                                         ; bits   7..0: configuration space offset
+    _F000:F696                                         ; bits  10..8: function number
+    _F000:F696                                         ; bits 15..11: device number
+    _F000:F696                                         ; bits 23..16: bus number
+    _F000:F698                 add     dl, 4
+    _F000:F69B                 mov     al, cl
+    _F000:F69D                 and     al, 3
+    _F000:F69F                 add     dl, al
+    _F000:F6A1                 in      al, dx
+    _F000:F6A2                 retn
+    _F000:F6A2 pci_read_dev    endp
+    
+    _F000:F6A4 pci_write_dev   proc near
+    _F000:F6A4                 xchg    ax, cx
+    _F000:F6A5                 and     eax, 8000FFFFh
+    _F000:F6AB                 or      eax, 80000000h
+    _F000:F6B1                 mov     ch, al
+    _F000:F6B3                 and     al, 0FCh
+    _F000:F6B5                 mov     dx, 0CF8h
+    _F000:F6B8                 out     dx, eax         ; PCI Configuration Space Address Register
+    _F000:F6B8                                         ; bits   7..0: configuration space offset
+    _F000:F6B8                                         ; bits  10..8: function number
+    _F000:F6B8                                         ; bits 15..11: device number
+    _F000:F6B8                                         ; bits 23..16: bus number
+    _F000:F6BA                 mov     al, ch
+    _F000:F6BC                 add     dl, 4
+    _F000:F6BF                 and     ch, 3
+    _F000:F6C2                 add     dl, ch
+    _F000:F6C4                 xchg    ax, cx
+    _F000:F6C5                 out     dx, al
+    _F000:F6C6                 retn
+    _F000:F6C6 pci_write_dev   endp
+
 ### Comments
 Please feel free to correct any mistakes I made and expand explanations. You can use Github Issues of just send pull requests. All contributions are welcome.
